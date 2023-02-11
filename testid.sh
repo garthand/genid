@@ -25,6 +25,8 @@ function genid {
 	# Print the result to stdout and save it
 	# to the last_id file
 	echo "$new_number" | tee .last_id
+	# Write the (empty) contents of file descriptor 222
+	# to the file to release the lock
 	) 222>.genid_lockfile
 }
 
