@@ -31,4 +31,8 @@ function genid {
 	) 222>.genid_lockfile
 }
 
-genid
+export -f genid
+seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ > results &
+seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ > results &
+seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ > results &
+seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ > results &
