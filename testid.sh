@@ -55,6 +55,10 @@ function genid_spawner {
 
 function test_genid {
 	# Declare variables locally
+	local first_id
+	local expected_output
+	local actual_output
+	first_id=$(printf "%05d" "$(echo "$(cat .genid_last_id)" + 1|bc -l)")
 	expected_output=$(printf "%05d\n" $(seq 1 50000))
 	genid_spawner
 	actual_output=$(cat .genid_test_results)
