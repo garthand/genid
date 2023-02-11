@@ -41,6 +41,7 @@ function genid_spawner {
 	fi
 	# Export genid function for use within xargs subshells
 	export -f genid
+	export GENID_LAST_ID
 	count=0
 	# Spawn 20 instances of genid_spawner
 	while [ "$count" -lt "$GENID_NUM_LOOPS" ]
@@ -48,7 +49,7 @@ function genid_spawner {
 		# Run 1,000 instances of genid simultaneously in
 		# the background, and append the output to a file
 		# named genid_test_results
-		seq 500|xargs -P "$GENID_NUM_PROCS" bash -c 'for arg; do genid; done' _ >> "$GENID_TEST_RESULTS" &
+		seq "$GENID_NUM_PROCS"|xargs -P "$GENID_NUM_PROCS" bash -c 'for arg; do genid; done' _ >> "$GENID_TEST_RESULTS" &
 		count=$((count + 1))
 	done
 }
@@ -58,6 +59,9 @@ function genid_spawner_watcher {
 	local first_reading
 	local second_reading
 	local matching
+	# Print a message to stdout so users know the test isn't
+	# simply hanging
+	echo "Waiting for all genid instances to finish running, this may take some time..."
 	matching="no"
 	while [ "$matching" == "no" ]
 	do
@@ -108,8 +112,8 @@ function test_genid {
 
 # GLOBAL VARIABLES
 
-GENID_NUM_LOOPS=20
-GENID_NUM_PROCS=500
+GENID_NUM_LOOPS=10
+GENID_NUM_PROCS=50
 GENID_TEST_RESULTS=.genid_test_results
 GENID_LAST_ID=.genid_last_id
 
