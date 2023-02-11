@@ -18,8 +18,7 @@ function genid {
 	new_number=$((last_number + 1))
 	# Print the result to stdout and save it
 	# to the last_id file
-	echo "$new_number" > .last_id
-	echo "$new_number"
+	echo "$new_number" | tee .last_id
 	) 222>.genid_lockfile
 }
 
