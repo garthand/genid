@@ -12,6 +12,12 @@ function genid {
 	# If another process already has a lock on 222,
 	# wait for the file lock to be released before continuing
 	(flock 222
+	# Create the last_id file if it does not yet exist
+	# and start the ID generation from 0
+	if ! test -f .last_id
+	then
+		echo 0 > .last_id
+	fi
 	# Get the last used ID from the last_id file
 	last_number=$(cat .last_id)
 	# Increment the last_id by one
