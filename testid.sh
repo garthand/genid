@@ -58,8 +58,11 @@ function test_genid {
 	local first_id
 	local expected_output
 	local actual_output
+	# Find the expected first ID
 	first_id=$(printf "%05d" "$(echo "$(cat .genid_last_id)" + 1|bc -l)")
-	expected_output=$(printf "%05d\n" $(seq 1 50000))
+	# Find the expected last ID
+	last_id=$(printf "%05d" "$(echo "$first_id" + 50000|bc -l)")
+	expected_output=$(printf "%05d\n" $(seq "$first_id" "$last_id"))
 	genid_spawner
 	actual_output=$(cat .genid_test_results)
 	if [ "$expected_output" == "$actual_output" ]
