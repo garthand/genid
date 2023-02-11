@@ -32,24 +32,22 @@ function genid {
 }
 
 function genid_spawner {
+	# Declare local variables
+	local count
 	# Export genid function for use within xargs subshells
 	export -f genid
-	# Run 1,000 instances of genid simultaneously
-	seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _
+	count=0
+	# Spawn 50 instances of genid_spawner
+	while [ "$count" -lt 50 ]
+	do
+		# Run 1,000 instances of genid simultaneously in
+		# the background, and append the output to a file
+		# named genid_test_results
+		seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ >> .genid_test_results &
+		count=$((count + 1))
+	done
 }
 
 function test_genid {
-	# Declare local variables
-	local count
-	count=0
-	# Spawn 10 instances of genid_spawner
-	while [ "$count" -lt 10 ]
-	do
-		# Run genid_spawner in the background
-		# and append the output to a file named
-		# genid_test_results
-		genid_spawner >> .genid_test_results &
-		count=$((count + 1))
-	done
-
+	genid_spawner
 }
