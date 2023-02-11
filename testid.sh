@@ -38,6 +38,17 @@ function genid_spawner {
 	seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _
 }
 
-genid_spawner > results &
-genid_spawner > results &
-genid_spawner > results &
+function test_genid {
+	# Declare local variables
+	local count
+	count=0
+	# Spawn 10 instances of genid_spawner
+	while [ "$count" -lt 10 ]
+	do
+		# Run genid_spawner in the background
+		# and append the output to a file named
+		# genid_test_results
+		genid_spawner >> genid_test_results &
+	done
+
+}
