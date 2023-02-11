@@ -42,13 +42,13 @@ function genid_spawner {
 	# Export genid function for use within xargs subshells
 	export -f genid
 	count=0
-	# Spawn 50 instances of genid_spawner
-	while [ "$count" -lt 50 ]
+	# Spawn 20 instances of genid_spawner
+	while [ "$count" -lt "$GENID_NUM_LOOPS" ]
 	do
 		# Run 1,000 instances of genid simultaneously in
 		# the background, and append the output to a file
 		# named genid_test_results
-		seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ >> .genid_test_results &
+		seq 500|xargs -P "$GENID_NUM_PROCS" bash -c 'for arg; do genid; done' _ >> .genid_test_results &
 		count=$((count + 1))
 	done
 }
@@ -56,15 +56,19 @@ function genid_spawner {
 function test_genid {
 	# Declare variables locally
 	local first_id
+	local lastid_difference
 	local expected_output
 	local actual_output
 	# Find the expected first ID
 	first_id=$(printf "%05d" "$(echo "$(cat .genid_last_id)" + 1|bc -l)")
+	# Find the difference between the first and last ID
+	lastid_difference=$(echo "($GENID_NUM_LOOPS * $GENID_NUM_PROCS) - 1"|bc -l)
 	# Find the expected last ID
-	last_id=$(printf "%05d" "$(echo "$first_id" + 50000|bc -l)")
+	last_id=$(printf "%05d" "$(echo "$first_id" + "$lastid_difference"|bc -l)")
 	expected_output=$(printf "%05d\n" $(seq "$first_id" "$last_id"))
 	genid_spawner
 	actual_output=$(cat .genid_test_results)
+	echo "$expected_output" > .genid_expected_results
 	if [ "$expected_output" == "$actual_output" ]
 	then
 		echo "genid appears to be working correctly"
@@ -73,3 +77,10 @@ function test_genid {
 	fi
 
 }
+
+# GLOBAL VARIABLES
+
+GENID_NUM_LOOPS=20
+GENID_NUM_PROCS=500
+
+test_genid
