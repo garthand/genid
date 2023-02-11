@@ -53,12 +53,16 @@ function genid_spawner {
 	done
 }
 
-function compare_results {
-	# Declare variables locally
-	printf "%05d\n" $(seq 1 50000)
-
-}
-
 function test_genid {
+	# Declare variables locally
+	expected_output=$(printf "%05d\n" $(seq 1 50000))
 	genid_spawner
+	actual_output=$(cat .genid_test_results)
+	if [ "$expected_output" == "$actual_output" ]
+	then
+		echo "genid appears to be working correctly"
+	else
+		echo "genid is not working as expected"
+	fi
+
 }
