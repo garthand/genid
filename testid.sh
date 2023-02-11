@@ -81,6 +81,37 @@ function genid_spawner_watcher {
 	done
 }
 
+function detailed_genid_report {
+	# Declare variables locally
+	local expected_output
+	local expected_line_count
+	local actual_line_count
+	local first_expected_entry
+	local first_actual_entry
+	local last_expected_entry
+	local last_actual_entry
+	# The expected output should be the only parameter
+	expected_output=$1
+	# Compare the actual vs expected line counts
+	expected_line_count=$(wc -l <<< "$expected_output")
+	actual_line_count=$(wc -l "$GENID_TEST_RESULTS"|awk '{print $1}')
+	# Compare the actual vs expected first entries
+	first_expected_entry=$(head -1 <<< "$expected_output")
+	first_actual_entry=$(head -1 "$GENID_TEST_RESULTS")
+	# Compare the actual vs expected last entries
+	last_expected_entry=$(tail -1 <<< "$expected_output")
+	last_actual_entry=$(tail -1 "$GENID_TEST_RESULTS")
+	echo "Detailed results:"
+	echo "------------------------------"
+	echo "Expected line count: $expected_line_count"
+	echo "Actual line count: $actual_line_count"
+	echo "First expected entry: $first_expected_entry"
+	echo "First actual entry: $first_actual_entry"
+	echo "Last expected entry: $last_expected_entry"
+	echo "Last actual entry: $last_actual_entry"
+	echo "------------------------------"
+}
+
 function test_genid {
 	# Declare variables locally
 	local first_id
@@ -103,10 +134,11 @@ function test_genid {
 	echo "$expected_output" > .genid_expected_results
 	if [ "$expected_output" == "$actual_output" ]
 	then
-		echo "genid appears to be working correctly"
+		printf "\nSUCCESS: genid appears to be working correctly\n\n"
 	else
-		echo "genid is not working as expected"
+		printf "\nFALIURE: genid is not working as expected\n\n"
 	fi
+	detailed_genid_report "$expected_output"
 
 }
 
