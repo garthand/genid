@@ -32,8 +32,9 @@ function genid {
 }
 
 function genid_spawner {
-	# Run 1,000 instances of genid simultaneously
+	# Export genid function for use within xargs subshells
 	export -f genid
+	# Run 1,000 instances of genid simultaneously
 	seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _
 }
 
