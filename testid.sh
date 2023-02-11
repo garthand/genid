@@ -34,6 +34,11 @@ function genid {
 function genid_spawner {
 	# Declare local variables
 	local count
+	# Remove genid_test_results file if it exists from previous runs
+	if test -f .genid_test_results
+	then
+		rm -f .genid_test_results
+	fi
 	# Export genid function for use within xargs subshells
 	export -f genid
 	count=0
