@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events
   push:
-    branches: [ "main", "lockfile_test", "formatter" ]
+    branches: [ "main", "lockfile_test", "formatter", "testing" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
