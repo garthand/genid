@@ -6,10 +6,10 @@ IFS=$'\n\t'
 
 function genid {
 	(flock 222
-	last_count=$(cat countfile)
-	count=$((last_count+1))
-	echo "$count" > countfile
-	echo "$count"
+	last_number=$(cat countfile)
+	new_number=$((last_number + 1))
+	echo "$new_number" > countfile
+	echo "$new_number"
 	) 222>.genid_lockfile
 }
 
