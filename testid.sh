@@ -21,7 +21,7 @@ function genid {
 	# Get the last used ID from the last_id file
 	last_number=$(cat .last_id)
 	# Increment the last_id by one
-	new_number=$(printf "%05d" "$(echo "$last_number + 1")")
+	new_number=$(printf "%05d" "$(echo "$last_number + 1"|bc -l)")
 	# Print the result to stdout and save it
 	# to the last_id file
 	echo "$new_number" | tee .last_id
