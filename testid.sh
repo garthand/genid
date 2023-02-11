@@ -49,6 +49,7 @@ function test_genid {
 		# and append the output to a file named
 		# genid_test_results
 		genid_spawner >> genid_test_results &
+		count=$((count + 1))
 	done
 
 }
