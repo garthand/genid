@@ -6,6 +6,8 @@ IFS=$'\n\t'
 
 function genid {
 	(flock 222
+	local last_number
+	local new_number
 	last_number=$(cat countfile)
 	new_number=$((last_number + 1))
 	echo "$new_number" > countfile
