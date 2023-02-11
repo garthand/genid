@@ -53,6 +53,30 @@ function genid_spawner {
 	done
 }
 
+function genid_spawner_watcher {
+	# Declare variables locally
+	local first_reading
+	local second_reading
+	local matching
+	matching="no"
+	while [ "$matching" == "no" ]
+	do
+		# Read the genid_test_results file
+		first_reading=$(cat .genid_test_results)
+		# Wait a few seconds
+		sleep 3
+		# Read the genid_test results file again
+		second_reading=$(cat .genid_test_results)
+		# See if the readings are identical. If so,
+		# genid_spawner has stopped updating the results
+		# file and we can stop waiting
+		if [ "$first_reading" == "$second_reading" ]
+		then
+			matching="yes"
+		fi
+	done
+}
+
 function test_genid {
 	# Declare variables locally
 	local first_id
@@ -65,8 +89,12 @@ function test_genid {
 	lastid_difference=$(echo "($GENID_NUM_LOOPS * $GENID_NUM_PROCS) - 1"|bc -l)
 	# Find the expected last ID
 	last_id=$(printf "%05d" "$(echo "$first_id" + "$lastid_difference"|bc -l)")
+	# Generate the expected output for the given test range
 	expected_output=$(printf "%05d\n" $(seq "$first_id" "$last_id"))
+	# Begin running the test using genid
 	genid_spawner
+	# Wait for the genid spawner processes to complete before continuing
+	genid_spawner_watcher
 	actual_output=$(cat .genid_test_results)
 	echo "$expected_output" > .genid_expected_results
 	if [ "$expected_output" == "$actual_output" ]
