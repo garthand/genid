@@ -81,6 +81,22 @@ function genid_spawner_watcher {
 	done
 }
 
+function generate_expected_output {
+	local first_id
+	local lastid_difference
+	local expected_output
+	local actual_output
+	# Find the expected first ID
+	first_id=$(printf "%05d" "$(echo "$(cat "$GENID_LAST_ID")" + 1|bc -l)")
+	# Find the difference between the first and last ID
+	lastid_difference=$(echo "($GENID_NUM_LOOPS * $GENID_NUM_PROCS) - 1"|bc -l)
+	# Find the expected last ID
+	last_id=$(printf "%05d" "$(echo "$first_id" + "$lastid_difference"|bc -l)")
+	# Generate the expected output for the given test range
+	expected_output=$(printf "%05d\n" $(seq "$first_id" "$last_id"))
+	echo "$expected_output"
+}
+
 function detailed_genid_report {
 	# Declare variables locally
 	local expected_output
@@ -114,24 +130,15 @@ function detailed_genid_report {
 
 function test_genid {
 	# Declare variables locally
-	local first_id
-	local lastid_difference
 	local expected_output
 	local actual_output
-	# Find the expected first ID
-	first_id=$(printf "%05d" "$(echo "$(cat "$GENID_LAST_ID")" + 1|bc -l)")
-	# Find the difference between the first and last ID
-	lastid_difference=$(echo "($GENID_NUM_LOOPS * $GENID_NUM_PROCS) - 1"|bc -l)
-	# Find the expected last ID
-	last_id=$(printf "%05d" "$(echo "$first_id" + "$lastid_difference"|bc -l)")
-	# Generate the expected output for the given test range
-	expected_output=$(printf "%05d\n" $(seq "$first_id" "$last_id"))
+	# Get expected output from running genid_spawner
+	expected_output=$(generate_expected_output)
 	# Begin running the test using genid
 	genid_spawner
 	# Wait for the genid spawner processes to complete before continuing
 	genid_spawner_watcher
 	actual_output=$(cat "$GENID_TEST_RESULTS")
-	echo "$expected_output" > .genid_expected_results
 	if [ "$expected_output" == "$actual_output" ]
 	then
 		printf "\nSUCCESS: genid appears to be working correctly\n\n"
