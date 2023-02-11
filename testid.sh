@@ -32,6 +32,7 @@ function genid {
 }
 
 function genid_spawner {
+	# Run 1,000 instances of genid simultaneously
 	export -f genid
 	seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _
 }
