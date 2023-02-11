@@ -14,18 +14,18 @@ function genid {
 	(flock 222
 	# Create the genid_last_id file if it does not yet exist
 	# and start the ID generation from 00000
-	if ! test -f .genid_last_id
+	if ! test -f "$GENID_LAST_ID"
 	then
-		echo 00000 > .genid_last_id
+		echo 00000 > "$GENID_LAST_ID"
 	fi
 	# Get the last used ID from the genid_last_id file
-	last_number=$(cat .genid_last_id)
+	last_number=$(cat "$GENID_LAST_ID")
 	# Increment the genid_last_id by one and format it
 	# with leading zeros if necessary
 	new_number=$(printf "%05d" "$(echo "$last_number + 1"|bc -l)")
 	# Print the result to stdout and save it
 	# to the genid_last_id file
-	echo "$new_number" | tee .genid_last_id
+	echo "$new_number" | tee "$GENID_LAST_ID"
 	# Write the (empty) contents of file descriptor 222
 	# to the file to release the lock
 	) 222>.genid_lockfile
@@ -35,9 +35,9 @@ function genid_spawner {
 	# Declare variables locally
 	local count
 	# Remove genid_test_results file if it exists from previous runs
-	if test -f .genid_test_results
+	if test -f "$GENID_TEST_RESULTS"
 	then
-		rm -f .genid_test_results
+		rm -f "$GENID_TEST_RESULTS"
 	fi
 	# Export genid function for use within xargs subshells
 	export -f genid
@@ -48,7 +48,7 @@ function genid_spawner {
 		# Run 1,000 instances of genid simultaneously in
 		# the background, and append the output to a file
 		# named genid_test_results
-		seq 500|xargs -P "$GENID_NUM_PROCS" bash -c 'for arg; do genid; done' _ >> .genid_test_results &
+		seq 500|xargs -P "$GENID_NUM_PROCS" bash -c 'for arg; do genid; done' _ >> "$GENID_TEST_RESULTS" &
 		count=$((count + 1))
 	done
 }
@@ -62,11 +62,11 @@ function genid_spawner_watcher {
 	while [ "$matching" == "no" ]
 	do
 		# Read the genid_test_results file
-		first_reading=$(cat .genid_test_results)
+		first_reading=$(cat "$GENID_TEST_RESULTS")
 		# Wait a few seconds
 		sleep 3
 		# Read the genid_test results file again
-		second_reading=$(cat .genid_test_results)
+		second_reading=$(cat "$GENID_TEST_RESULTS")
 		# See if the readings are identical. If so,
 		# genid_spawner has stopped updating the results
 		# file and we can stop waiting
@@ -84,7 +84,7 @@ function test_genid {
 	local expected_output
 	local actual_output
 	# Find the expected first ID
-	first_id=$(printf "%05d" "$(echo "$(cat .genid_last_id)" + 1|bc -l)")
+	first_id=$(printf "%05d" "$(echo "$(cat "$GENID_LAST_ID")" + 1|bc -l)")
 	# Find the difference between the first and last ID
 	lastid_difference=$(echo "($GENID_NUM_LOOPS * $GENID_NUM_PROCS) - 1"|bc -l)
 	# Find the expected last ID
@@ -95,7 +95,7 @@ function test_genid {
 	genid_spawner
 	# Wait for the genid spawner processes to complete before continuing
 	genid_spawner_watcher
-	actual_output=$(cat .genid_test_results)
+	actual_output=$(cat "$GENID_TEST_RESULTS")
 	echo "$expected_output" > .genid_expected_results
 	if [ "$expected_output" == "$actual_output" ]
 	then
@@ -110,5 +110,7 @@ function test_genid {
 
 GENID_NUM_LOOPS=20
 GENID_NUM_PROCS=500
+GENID_TEST_RESULTS=.genid_test_results
+GENID_LAST_ID=.genid_last_id
 
 test_genid
