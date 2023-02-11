@@ -32,7 +32,7 @@ function genid {
 }
 
 function genid_spawner {
-	# Declare local variables
+	# Declare variables locally
 	local count
 	# Remove genid_test_results file if it exists from previous runs
 	if test -f .genid_test_results
@@ -51,6 +51,12 @@ function genid_spawner {
 		seq 1000|xargs -P 1000 bash -c 'for arg; do genid; done' _ >> .genid_test_results &
 		count=$((count + 1))
 	done
+}
+
+function compare_results {
+	# Declare variables locally
+	printf "%05d\n" $(seq 1 50000)
+
 }
 
 function test_genid {
