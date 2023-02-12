@@ -107,6 +107,7 @@ function detailed_genid_report {
 	local last_expected_entry
 	local last_actual_entry
 	local duplicated_lines
+	local genid_test
 	# The expected output should be the only parameter
 	expected_output=$1
 	# Compare the actual vs expected line counts
@@ -124,50 +125,50 @@ function detailed_genid_report {
 	missing_ids=$(seq "$(head -n1 "$GENID_TEST_RESULTS")" "$(tail -n1 "$GENID_TEST_RESULTS")" | grep -vwFf "$GENID_TEST_RESULTS" || true)
 	echo "Detailed report:"
 	echo "------------------------------"
+	genid_test="Expected and actual line count should match"
 	if [ "$expected_line_count" != "$actual_line_count" ]
 	then
-		echo "FAIL"
+		echo "FAIL: $genid_test"
 		echo "Expected line count: $expected_line_count"
 		echo "Actual line count: $actual_line_count"
 	else
-		echo "PASS"
-		echo "Expected and actual line count match"
+		echo "PASS: $genid_test"
 	fi
+	genid_test="Expected and actual first entry should match"
 	if [ "$first_expected_entry" != "$first_actual_entry" ]
 	then
-		echo "FAIL"
+		echo "FAIL: $genid_test"
 		echo "First expected entry: $first_expected_entry"
 		echo "First actual entry: $first_actual_entry"
 	else
-		echo "PASS"
-		echo "Expected and actual first entry match"
+		echo "PASS: $genid_test"
 	fi
+	genid_test="Expected and actual last entry should match"
 	if [ "$last_expected_entry" != "$last_actual_entry" ]
 	then
-		echo "FAIL"
+		echo "FAIL: $genid_test"
 		echo "Last expected entry: $last_expected_entry"
 		echo "Last actual entry: $last_actual_entry"
 	else
-		echo "PASS"
-		echo "Expected and actual last entry match"
+		echo "PASS: $genid_test"
 	fi
+	genid_test="No duplicate IDs should be found"
 	if [ "$duplicated_lines" != "" ]
 	then
-		echo "FAIL"
+		echo "FAIL: $genid_test"
 		echo "Duplicated IDs:"
 		echo "$duplicated_lines"
 	else
-		echo "PASS"
-		echo "No duplicated IDs detected"
+		echo "PASS: $genid_test"
 	fi
+	genid_test="No missing IDs should be found"
 	if [ "$missing_ids" != "" ]
 	then
-		echo "FAIL"
+		echo "FAIL: $genid_test"
 		echo "Missing IDs:"
 		echo "$missing_lines"
 	else
-		echo "PASS"
-		echo "No missing IDs detected"
+		echo "PASS: $genid_test"
 	fi
 	echo "------------------------------"
 }
