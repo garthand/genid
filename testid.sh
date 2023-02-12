@@ -8,8 +8,8 @@ function genid {
 	# Define variables locally
 	local last_number
 	local new_number
-	# Create a file lock on descriptor 222
-	# If another process already has a lock on 222,
+	# Create a file lock on the specified file descriptor
+	# If another process already has a lock on the descriptor,
 	# wait for the file lock to be released before continuing
 	(flock 222
 	# Create the genid_last_id file if it does not yet exist
@@ -26,7 +26,7 @@ function genid {
 	# Print the result to stdout and save it
 	# to the genid_last_id file
 	echo "$new_number" | tee "$GENID_LAST_ID"
-	# Write the (empty) contents of file descriptor 222
+	# Write the (empty) contents of the file descriptor
 	# to the file to release the lock
 	) 222>.genid_lockfile
 }
