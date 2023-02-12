@@ -106,7 +106,8 @@ function detailed_genid_report {
 	local first_actual_entry
 	local last_expected_entry
 	local last_actual_entry
-	local duplicated_lines
+	local duplicated_ids
+	local missing_ids
 	local genid_test
 	# The expected output should be the only parameter
 	expected_output=$1
@@ -120,7 +121,7 @@ function detailed_genid_report {
 	last_expected_entry=$(tail -1 <<< "$expected_output")
 	last_actual_entry=$(tail -1 "$GENID_TEST_RESULTS")
 	# Find duplicated lines
-	duplicated_lines=$(uniq -d "$GENID_TEST_RESULTS")
+	duplicated_ids=$(uniq -d "$GENID_TEST_RESULTS")
 	# Find missing IDs
 	missing_ids=$(seq "$(head -n1 "$GENID_TEST_RESULTS")" "$(tail -n1 "$GENID_TEST_RESULTS")" | grep -vwFf "$GENID_TEST_RESULTS" || true)
 	echo "Detailed report:"
@@ -153,11 +154,11 @@ function detailed_genid_report {
 		echo "PASS: $genid_test"
 	fi
 	genid_test="No duplicate IDs should be found"
-	if [ "$duplicated_lines" != "" ]
+	if [ "$duplicated_ids" != "" ]
 	then
 		echo "FAIL: $genid_test"
 		echo "Duplicated IDs:"
-		echo "$duplicated_lines"
+		echo "$duplicated_ids"
 	else
 		echo "PASS: $genid_test"
 	fi
@@ -166,7 +167,7 @@ function detailed_genid_report {
 	then
 		echo "FAIL: $genid_test"
 		echo "Missing IDs:"
-		echo "$missing_lines"
+		echo "$missing_ids"
 	else
 		echo "PASS: $genid_test"
 	fi
