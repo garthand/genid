@@ -121,42 +121,52 @@ function detailed_genid_report {
 	# Find duplicated lines
 	duplicated_lines=$(uniq -d "$GENID_TEST_RESULTS")
 	# Find missing IDs
-	missing_ids=$(seq "$(head -n1 "$GENID_TEST_RESULTS")" "$(tail -n1 "$GENID_TEST_RESULTS")" | grep -vwFf "$GENID_TEST_RESULTS")
-	echo "Detailed errors:"
+	missing_ids=$(seq "$(head -n1 "$GENID_TEST_RESULTS")" "$(tail -n1 "$GENID_TEST_RESULTS")" | grep -vwFf "$GENID_TEST_RESULTS" || true)
+	echo "Detailed report:"
 	echo "------------------------------"
 	if [ "$expected_line_count" != "$actual_line_count" ]
 	then
+		echo "FAIL"
 		echo "Expected line count: $expected_line_count"
 		echo "Actual line count: $actual_line_count"
 	else
+		echo "PASS"
 		echo "Expected and actual line count match"
 	fi
 	if [ "$first_expected_entry" != "$first_actual_entry" ]
 	then
+		echo "FAIL"
 		echo "First expected entry: $first_expected_entry"
 		echo "First actual entry: $first_actual_entry"
 	else
+		echo "PASS"
 		echo "Expected and actual first entry match"
 	fi
 	if [ "$last_expected_entry" != "$last_actual_entry" ]
 	then
+		echo "FAIL"
 		echo "Last expected entry: $last_expected_entry"
 		echo "Last actual entry: $last_actual_entry"
 	else
+		echo "PASS"
 		echo "Expected and actual last entry match"
 	fi
 	if [ "$duplicated_lines" != "" ]
 	then
+		echo "FAIL"
 		echo "Duplicated IDs:"
 		echo "$duplicated_lines"
 	else
+		echo "PASS"
 		echo "No duplicated IDs detected"
 	fi
 	if [ "$missing_ids" != "" ]
 	then
+		echo "FAIL"
 		echo "Missing IDs:"
 		echo "$missing_lines"
 	else
+		echo "PASS"
 		echo "No missing IDs detected"
 	fi
 	echo "------------------------------"
