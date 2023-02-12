@@ -106,6 +106,7 @@ function detailed_genid_report {
 	local first_actual_entry
 	local last_expected_entry
 	local last_actual_entry
+	local duplicated_lines
 	# The expected output should be the only parameter
 	expected_output=$1
 	# Compare the actual vs expected line counts
@@ -117,14 +118,47 @@ function detailed_genid_report {
 	# Compare the actual vs expected last entries
 	last_expected_entry=$(tail -1 <<< "$expected_output")
 	last_actual_entry=$(tail -1 "$GENID_TEST_RESULTS")
-	echo "Detailed results:"
+	# Find duplicated lines
+	duplicated_lines=$(uniq -d "$GENID_TEST_RESULTS")
+	# Find missing IDs
+	missing_ids=$(seq "$(head -n1 "$GENID_TEST_RESULTS")" "$(tail -n1 "$GENID_TEST_RESULTS")" | grep -vwFf "$GENID_TEST_RESULTS")
+	echo "Detailed errors:"
 	echo "------------------------------"
-	echo "Expected line count: $expected_line_count"
-	echo "Actual line count: $actual_line_count"
-	echo "First expected entry: $first_expected_entry"
-	echo "First actual entry: $first_actual_entry"
-	echo "Last expected entry: $last_expected_entry"
-	echo "Last actual entry: $last_actual_entry"
+	if [ "$expected_line_count" != "$actual_line_count" ]
+	then
+		echo "Expected line count: $expected_line_count"
+		echo "Actual line count: $actual_line_count"
+	else
+		echo "Expected and actual line count match"
+	fi
+	if [ "$first_expected_entry" != "$first_actual_entry" ]
+	then
+		echo "First expected entry: $first_expected_entry"
+		echo "First actual entry: $first_actual_entry"
+	else
+		echo "Expected and actual first entry match"
+	fi
+	if [ "$last_expected_entry" != "$last_actual_entry" ]
+	then
+		echo "Last expected entry: $last_expected_entry"
+		echo "Last actual entry: $last_actual_entry"
+	else
+		echo "Expected and actual last entry match"
+	fi
+	if [ "$duplicated_lines" != "" ]
+	then
+		echo "Duplicated IDs:"
+		echo "$duplicated_lines"
+	else
+		echo "No duplicated IDs detected"
+	fi
+	if [ "$missing_ids" != "" ]
+	then
+		echo "Missing IDs:"
+		echo "$missing_lines"
+	else
+		echo "No missing IDs detected"
+	fi
 	echo "------------------------------"
 }
 
